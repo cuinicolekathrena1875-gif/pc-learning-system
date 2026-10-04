@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hardware Learning System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<style>
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', sans-serif;
+  background: #0f172a;
+  color: white;
+}
+
+main {
+  flex: 1;
+}
+
+/* NAVBAR */
+.navbar {
+  background: #020617;
+  border-bottom: 1px solid #1e293b;
+}
+
+/* HERO */
+.hero {
+  padding: 40px 15px 20px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.hero p {
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+/* DASHBOARD PREVIEW */
+.dashboard-preview {
+  margin-top: 20px;
+  padding: 15px;
+}
+
+.card-box {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 15px;
+  transition: 0.2s;
+  height: 100%;
+}
+
+.card-box:hover {
+  transform: translateY(-3px);
+}
+
+/* LOCKED STYLE */
+.locked {
+  opacity: 0.5;
+  position: relative;
+}
+
+.locked::after {
+  content: "Locked";
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: red;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 10px;
+}
+
+/* BUTTON */
+.btn-main {
+  background: #3b82f6;
+  border: none;
+}
+
+.btn-main:hover {
+  background: #2563eb;
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 10px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* MOBILE FIX */
+@media (max-width: 576px) {
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero p {
+    font-size: 0.85rem;
+  }
+
+  .btn {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg px-3 py-2">
+  <span class="navbar-brand text-white fw-bold">Hardware Learning</span>
+
+  <div class="ms-auto">
+    <a href="login.html" class="btn btn-outline-light btn-sm me-1">Login</a>
+    <a href="register.html" class="btn btn-main btn-sm">Register</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Master Computer Hardware</h1>
+  <p>Learn components, earn points, and unlock advanced quizzes</p>
+
+  <a href="register.html" class="btn btn-main mt-2 btn-sm">Start Learning</a>
+</div>
+
+<!-- DASHBOARD PREVIEW -->
+<div class="container dashboard-preview">
+
+  <h5 class="mb-3">System Preview</h5>
+
+  <div class="row g-3">
+
+    <!-- POINTS -->
+    <div class="col-6 col-md-4">
+      <div class="card-box text-center">
+        <h6>Points</h6>
+        <h4 id="points">0</h4>
+        <p style="font-size:12px;">Earn from quizzes</p>
+      </div>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="col-6 col-md-4">
+      <div class="card-box text-center">
+        <h6>Basic Quiz</h6>
+        <button class="btn btn-success btn-sm" onclick="startQuiz()">Play</button>
+      </div>
+    </div>
+
+    <!-- LOCKED QUIZ -->
+    <div class="col-6 col-md-4">
+      <div class="card-box text-center locked">
+        <h6>Advanced Quiz</h6>
+        <p style="font-size:10px;">Requires 50 Points</p>
+      </div>
+    </div>
+
+    <!-- HARDWARE -->
+    <div class="col-6 col-md-6">
+      <div class="card-box">
+        <h6><i class="bi bi-cpu"></i> Hardware Learning</h6>
+        <p style="font-size:12px;">CPU, GPU, RAM with PH prices</p>
+      </div>
+    </div>
+
+    <!-- BUILDER -->
+    <div class="col-6 col-md-6">
+      <div class="card-box">
+        <h6><i class="bi bi-pc-display"></i> PC Builder</h6>
+        <p style="font-size:12px;">Build and estimate system cost</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  © 2026 Hardware Learning System
+</footer>
+
+<!-- SCRIPT -->
+<script src="config.js"></script>
+
+<script>
+// LOAD USER + POINTS
+async function loadUser() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+
+  if(user){
+    const { data } = await supabaseClient
+      .from('users_data')
+      .select('points')
+      .eq('id', user.id)
+      .single();
+
+    if(data){
+      document.getElementById("points").innerText = data.points;
+    }
+  }
+}
+
+// PLAY BUTTON LOGIC
+async function startQuiz() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+
+  if(!user){
+    alert("Please login first!");
+    window.location.href = "login.html";
+    return;
+  }
+
+  window.location.href = "quiz.html";
+}
+
+loadUser();
+</script>
+
+</body>
+</html>
