@@ -7,9 +7,6 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 body {
   background: #0f172a;
@@ -17,6 +14,7 @@ body {
   margin: 0;
 }
 
+/* MODAL BACKGROUND */
 .modal-bg {
   position: fixed;
   top: 0;
@@ -29,6 +27,7 @@ body {
   align-items: center;
 }
 
+/* FORM BOX */
 .form-box {
   background: #1e293b;
   padding: 25px;
@@ -39,6 +38,7 @@ body {
   color: white;
 }
 
+/* CLOSE BUTTON */
 .close-btn {
   position: absolute;
   top: 10px;
@@ -52,12 +52,14 @@ body {
   color: red;
 }
 
+/* INPUT */
 input {
   background: #0f172a !important;
   color: white !important;
   border: 1px solid #334155 !important;
 }
 
+/* BUTTON */
 .btn-main {
   background: #3b82f6;
   border: none;
@@ -72,17 +74,16 @@ input {
 <body>
 
 <div class="modal-bg">
-
   <div class="form-box">
 
-    <a href="index.html" class="close-btn">✖</a>
+    <a href="index.html" class="close-btn">X</a>
 
     <h4 class="text-center mb-3">Create Account</h4>
 
     <input type="email" id="email" class="form-control mb-2" placeholder="Email">
     <input type="password" id="password" class="form-control mb-3" placeholder="Password">
 
-    <button id="btnRegister" class="btn btn-main w-100" onclick="register()">Register</button>
+    <button class="btn btn-main w-100" onclick="register()">Register</button>
 
     <p class="text-center mt-3" style="font-size:12px;">
       Already have an account?
@@ -90,33 +91,37 @@ input {
     </p>
 
   </div>
-
 </div>
 
-<!-- CONFIG -->
+<!-- IMPORTANT ORDER -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 
 <script>
 async function register() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  const btn = document.getElementById("btnRegister");
-
-  if (!email || !password) {
-    alert("Please fill all fields");
-    return;
-  }
-
-  btn.innerText = "Registering...";
-  btn.disabled = true;
-
   try {
+    if (typeof supabaseClient === "undefined") {
+      alert("Supabase is not connected. Check config.js");
+      return;
+    }
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!email || !password) {
+      alert("Please fill all fields");
+      return;
+    }
+
     const { data, error } = await supabaseClient.auth.signUp({
       email: email,
       password: password
     });
 
-    if (error) throw error;
+    if (error) {
+      alert(error.message);
+      return;
+    }
 
     const user = data.user;
 
@@ -132,21 +137,16 @@ async function register() {
         ]);
 
       if (insertError) {
-        console.error(insertError);
-        alert("User created but failed to save additional data.");
+        console.log(insertError);
       }
     }
 
-    alert("Registered successfully");
+    alert("Registered successfully. Check your email.");
     window.location.href = "login.html";
 
   } catch (err) {
-    console.error(err);
-    alert(err.message);
+    alert("Error: " + err.message);
   }
-
-  btn.innerText = "Register";
-  btn.disabled = false;
 }
 </script>
 
